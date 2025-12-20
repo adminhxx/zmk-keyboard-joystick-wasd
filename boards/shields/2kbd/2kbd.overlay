@@ -36,7 +36,7 @@
 
     kscan0: kscan_composite {
         compatible = "zmk,kscan-composite";
-        rows = <6>;
+        rows = <2>;
         columns = <4>;
 
         // Include the direct driver
@@ -47,7 +47,7 @@
         // Include the direct GPIO driver...
         direct_two {
             kscan = <&kscan2>;
-            row-offset = <4>; // ...and shift it to not overlap
+            row-offset = <1>; // ...and shift it to not overlap
         };
     };
 
