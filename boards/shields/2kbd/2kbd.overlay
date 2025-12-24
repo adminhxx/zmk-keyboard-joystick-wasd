@@ -65,7 +65,7 @@
         compatible = "zmk,kscan-joystick";
         poll-period-ms = <4>;  /* 250Hz */
         idle-period-ms = <50>; /* 20Hz */
-        angle-overlap = <30>;
+        angle-overlap = <40>;
         /* do not use a second threshold with bad quality joysticks */
         /* thresholds = [0A 78]; */
         status = "okay";
