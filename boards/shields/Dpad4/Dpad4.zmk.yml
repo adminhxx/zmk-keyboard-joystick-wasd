@@ -1,0 +1,9 @@
+---
+file_format: "1"
+id: Dpad4
+name: Dpad4
+type: shield
+url: https://github.com/adminhxx/RCPen
+requires: [pro_micro]
+exposes: []
+features: [keys]
