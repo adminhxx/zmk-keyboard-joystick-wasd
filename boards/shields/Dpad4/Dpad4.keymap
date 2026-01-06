@@ -11,7 +11,7 @@
 
         default_layer {
             bindings = < 
-              &kp W     &kp D     &kp S     &kp A
+              &kp W     &kp S     &kp A     &kp D
               &kp U     &kp I     &kp J     &kp K
               &kp C_MUTE     &bt BT_CLR_ALL
             >;
