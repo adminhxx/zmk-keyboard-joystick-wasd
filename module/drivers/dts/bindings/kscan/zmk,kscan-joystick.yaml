@@ -40,7 +40,7 @@ properties:
     description: The number of directions (cols) inferred from the joystick.
   thresholds:
     type: uint8-array
-    default: [0x0F]
+    default: [0x0A]
     description: The magnitude thresholds (rows) inferred from the joystick.
   hysteris:
     type: int
