@@ -153,7 +153,7 @@ static bool kscan_joystick_calibration_handler(struct kscan_joystick_calibration
 static void kscan_joystick_apply_ema(struct kscan_joystick_ema *ema, int16_t *x_raw, int16_t *y_raw) {
     if (!ema->initialized) {
         ema->x_filtered = *x_raw;
-        ema->x_filtered = *y_raw;
+        ema->y_filtered = *y_raw;
         ema->initialized = true;
     } else {
         ema->x_filtered = ((KSCAN_JE_ALPHA) * (*x_raw)) + ((1.0f - KSCAN_JE_ALPHA) * (ema->x_filtered));
