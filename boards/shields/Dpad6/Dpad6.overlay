@@ -66,11 +66,11 @@
         compatible = "zmk,kscan-joystick";
         poll-period-ms = <4>;  /* 250Hz */
         idle-period-ms = <50>; /* 20Hz */
-        angle-overlap = <0>;   /* 关闭方向重叠，避免误触发 */
+        angle-overlap = <15>;  /* 适度的方向重叠，平衡误触发和灵敏度 */
         /* do not use a second threshold with bad quality joysticks */
         /* thresholds = [0A 78]; */
-        thresholds = [50 78];  /* 大幅提高第一阈值: 0x50=80 */
-        hysteris = <25>;       /* 进一步增大死区到25 */
+        thresholds = [30 78];  /* 平衡阈值: 0x30=48，既能避免误触发又能正常触发 */
+        hysteris = <20>;       /* 适中的死区值 */
         status = "okay";
         wakeup-source;
         io-channels = <&adc 7>, <&adc 5>;
