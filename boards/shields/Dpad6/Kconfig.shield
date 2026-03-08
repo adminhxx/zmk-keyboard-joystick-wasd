@@ -1,0 +1,2 @@
+config SHIELD_DPAD6
+    def_bool $(shields_list_contains,Dpad6)
