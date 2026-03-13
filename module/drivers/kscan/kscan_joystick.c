@@ -102,21 +102,6 @@ struct kscan_joystick_config {
 };
 
 static bool kscan_joystick_calibration_handler(struct kscan_joystick_calibration *calibration, int16_t x, int16_t y) {
-    // Update maximum displacement from the center
-    if (x > calibration->center[0]) {
-        // x is greater than the center, update displacement in the positive direction
-        calibration->pos_disp[0] = MAX(calibration->pos_disp[0], x - calibration->center[0]);
-    } else {
-        // x is less than or equal to the center, update displacement in the negative direction
-        calibration->neg_disp[0] = MAX(calibration->neg_disp[0], calibration->center[0] - x);
-    }
-    if (y > calibration->center[1]) {
-        // y is greater than the center, update displacement in the positive direction
-        calibration->pos_disp[1] = MAX(calibration->pos_disp[1], y - calibration->center[1]);
-    } else {
-        // y is less than or equal to the center, displacement in the update negative direction
-        calibration->neg_disp[1] = MAX(calibration->neg_disp[1], calibration->center[1] - y);
-    }
     // Update center
     if (calibration->is_active) {
         // Write the analog values to the buffer
@@ -133,11 +118,12 @@ static bool kscan_joystick_calibration_handler(struct kscan_joystick_calibration
             // Write the new calibration
             calibration->center[0] = (int16_t)(sum_x / KSCAN_JC_NSAMPLES);
             calibration->center[1] = (int16_t)(sum_y / KSCAN_JC_NSAMPLES);
-            // Shrink the neg_disp & pos_disp values
-            calibration->neg_disp[0] = KSCAN_JC_SHRINK(calibration->neg_disp[0]);
-            calibration->pos_disp[0] = KSCAN_JC_SHRINK(calibration->pos_disp[0]);
-            calibration->neg_disp[1] = KSCAN_JC_SHRINK(calibration->neg_disp[1]);
-            calibration->pos_disp[1] = KSCAN_JC_SHRINK(calibration->pos_disp[1]);
+            // Reset displacement ranges after center re-calibration.
+            // They will be learned again in normal processing using the new center.
+            calibration->neg_disp[0] = KSCAN_JC_DEFAULT;
+            calibration->pos_disp[0] = KSCAN_JC_DEFAULT;
+            calibration->neg_disp[1] = KSCAN_JC_DEFAULT;
+            calibration->pos_disp[1] = KSCAN_JC_DEFAULT;
             // End the calibration
             calibration->counter = 0;
             calibration->is_active = false;
@@ -145,6 +131,22 @@ static bool kscan_joystick_calibration_handler(struct kscan_joystick_calibration
         }
         // Do not process joystick
         return false;
+    }
+
+    // Update maximum displacement from the calibrated center
+    if (x > calibration->center[0]) {
+        // x is greater than the center, update displacement in the positive direction
+        calibration->pos_disp[0] = MAX(calibration->pos_disp[0], x - calibration->center[0]);
+    } else {
+        // x is less than or equal to the center, update displacement in the negative direction
+        calibration->neg_disp[0] = MAX(calibration->neg_disp[0], calibration->center[0] - x);
+    }
+    if (y > calibration->center[1]) {
+        // y is greater than the center, update displacement in the positive direction
+        calibration->pos_disp[1] = MAX(calibration->pos_disp[1], y - calibration->center[1]);
+    } else {
+        // y is less than or equal to the center, displacement in the update negative direction
+        calibration->neg_disp[1] = MAX(calibration->neg_disp[1], calibration->center[1] - y);
     }
 
     return true;
@@ -221,11 +223,11 @@ static void kscan_joystick_work_handler(struct k_work *work) {
         int16_t y = y_raw - calibration->center[1];
         // Scale the ADC values between -127 and 127
         x = (x > 0)?
-            ((x * KSCAN_JC_SCALED) / calibration->pos_disp[0]):
-            ((x * KSCAN_JC_SCALED) / calibration->neg_disp[0]);
+            ((x * KSCAN_JC_SCALED) / MAX(1, calibration->pos_disp[0])):
+            ((x * KSCAN_JC_SCALED) / MAX(1, calibration->neg_disp[0]));
         y = (y > 0)?
-            ((y * KSCAN_JC_SCALED) / calibration->pos_disp[1]):
-            ((y * KSCAN_JC_SCALED) / calibration->neg_disp[1]);
+            ((y * KSCAN_JC_SCALED) / MAX(1, calibration->pos_disp[1])):
+            ((y * KSCAN_JC_SCALED) / MAX(1, calibration->neg_disp[1]));
 
         // LOG_DBG("CAL ADC CH0: %d, CH1: %d", x, y);
 
@@ -334,8 +336,15 @@ static int kscan_joystick_enable(const struct device *dev) {
     struct kscan_joystick_data *data = dev->data;
     const struct kscan_joystick_config *config = dev->config;
     struct kscan_joystick_calibration *calibration = &data->calibration;
+    struct kscan_joystick_ema *ema = &data->ema;
 
     LOG_DBG("Joystick kscan enabled - starting ADC polling");
+
+    // Reset runtime state before starting a new calibration cycle
+    data->threshold_state = 0;
+    data->idle_timeout = 0;
+    memset(data->key_state, 0, sizeof(data->key_state));
+    ema->initialized = false;
 
     // Trigger a calibration
     calibration->counter = 0;
