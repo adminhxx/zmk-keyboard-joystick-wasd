@@ -39,13 +39,11 @@
         rows = <4>;
         columns = <4>;
 
-        // Include the direct GPIO driver...
         direct_one {
             kscan = <&kscan1>;
             row-offset = <0>; // ...and shift it to not overlap
         };
 
-        // Include the direct driver
         direct_two {
             kscan = <&kscan2>;
             row-offset = <1>;
@@ -71,7 +69,7 @@
         /* thresholds = [0A 78]; */
         status = "okay";
         wakeup-source;
-        io-channels = <&adc 7>, <&adc 5>;
+        io-channels = <&adc 5>, <&adc 7>;
         io-channel-names = "x-axis", "y-axis";
     };
 
