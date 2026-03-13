@@ -69,8 +69,7 @@
         angle-overlap = <15>;
         /* do not use a second threshold with bad quality joysticks */
         /* thresholds = [0A 78]; */
-        thresholds = [3C 78];  /* 提高阈值: 0x3C=60，抑制误触发 */
-        hysteris = <28>;       /* 大死区防抖动 */
+        thresholds = [0A 78];
         status = "okay";
         wakeup-source;
         io-channels = <&adc 7>, <&adc 5>;
