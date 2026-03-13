@@ -67,7 +67,6 @@
         angle-overlap = <30>;
         /* do not use a second threshold with bad quality joysticks */
         /* thresholds = [0A 78]; */
-        thresholds = [03 78];
         status = "okay";
         wakeup-source;
         io-channels = <&adc 5>, <&adc 7>;
