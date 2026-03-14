@@ -208,13 +208,15 @@ static void kscan_joystick_work_handler(struct k_work *work) {
     int16_t x_raw = data->adc_buffer[0];
     int16_t y_raw = data->adc_buffer[1];
 
+        LOG_DBG("ADC raw CH%u=%d CH%u=%d",
+            config->adc_0.channel_id, x_raw,
+            config->adc_1.channel_id, y_raw);
+
     // Update the calibration
     if (kscan_joystick_calibration_handler(calibration, x_raw, y_raw)) {
 
         // Apply an exponential moving average
         kscan_joystick_apply_ema(ema, &x_raw, &y_raw);
-
-        // LOG_DBG("RAW ADC CH0: %d, CH1: %d", x_raw, y_raw);
 
         // Offset the ADC values
         int16_t x = x_raw - calibration->center[0];
