@@ -1,0 +1,9 @@
+---
+file_format: "1"
+id: Dpad6
+name: Dpad6
+type: shield
+url: https://github.com/adminhxx/Dpad6
+requires: [pro_micro]
+exposes: []
+features: [keys]
