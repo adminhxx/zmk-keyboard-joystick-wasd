@@ -46,7 +46,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #define KSCAN_JC_NSAMPLES 32
 #define KSCAN_JC_SCALED 127
 #define KSCAN_JC_DEFAULT 1000
-#define KSCAN_JC_MIN_DISP 8
+#define KSCAN_JC_MIN_DISP 24
 #define KSCAN_JC_SHRINK(n) (((n) * 3) / 4)
 /* Simple moving average constants */
 #define KSCAN_JE_ALPHA 0.5f
