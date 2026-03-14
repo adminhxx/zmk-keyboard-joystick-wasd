@@ -46,7 +46,6 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #define KSCAN_JC_NSAMPLES 32
 #define KSCAN_JC_SCALED 127
 #define KSCAN_JC_DEFAULT 1000
-#define KSCAN_JC_MIN_DISP 24
 #define KSCAN_JC_SHRINK(n) (((n) * 3) / 4)
 /* Simple moving average constants */
 #define KSCAN_JE_ALPHA 0.5f
@@ -139,11 +138,6 @@ static bool kscan_joystick_calibration_handler(struct kscan_joystick_calibration
             calibration->pos_disp[0] = KSCAN_JC_SHRINK(calibration->pos_disp[0]);
             calibration->neg_disp[1] = KSCAN_JC_SHRINK(calibration->neg_disp[1]);
             calibration->pos_disp[1] = KSCAN_JC_SHRINK(calibration->pos_disp[1]);
-            // Keep a lower bound to avoid divide-by-zero and preserve sensitivity
-            calibration->neg_disp[0] = MAX(calibration->neg_disp[0], KSCAN_JC_MIN_DISP);
-            calibration->pos_disp[0] = MAX(calibration->pos_disp[0], KSCAN_JC_MIN_DISP);
-            calibration->neg_disp[1] = MAX(calibration->neg_disp[1], KSCAN_JC_MIN_DISP);
-            calibration->pos_disp[1] = MAX(calibration->pos_disp[1], KSCAN_JC_MIN_DISP);
             // End the calibration
             calibration->counter = 0;
             calibration->is_active = false;
@@ -214,31 +208,24 @@ static void kscan_joystick_work_handler(struct k_work *work) {
     int16_t x_raw = data->adc_buffer[0];
     int16_t y_raw = data->adc_buffer[1];
 
-        LOG_DBG("ADC raw CH%u=%d CH%u=%d",
-            config->adc_0.channel_id, x_raw,
-            config->adc_1.channel_id, y_raw);
-
     // Update the calibration
     if (kscan_joystick_calibration_handler(calibration, x_raw, y_raw)) {
 
         // Apply an exponential moving average
         kscan_joystick_apply_ema(ema, &x_raw, &y_raw);
 
+        LOG_DBG("RAW ADC CH0: %d, CH1: %d", x_raw, y_raw);
+
         // Offset the ADC values
         int16_t x = x_raw - calibration->center[0];
         int16_t y = y_raw - calibration->center[1];
         // Scale the ADC values between -127 and 127
-        int16_t x_pos_disp = MAX(calibration->pos_disp[0], KSCAN_JC_MIN_DISP);
-        int16_t x_neg_disp = MAX(calibration->neg_disp[0], KSCAN_JC_MIN_DISP);
-        int16_t y_pos_disp = MAX(calibration->pos_disp[1], KSCAN_JC_MIN_DISP);
-        int16_t y_neg_disp = MAX(calibration->neg_disp[1], KSCAN_JC_MIN_DISP);
-
         x = (x > 0)?
-            ((x * KSCAN_JC_SCALED) / x_pos_disp):
-            ((x * KSCAN_JC_SCALED) / x_neg_disp);
+            ((x * KSCAN_JC_SCALED) / calibration->pos_disp[0]):
+            ((x * KSCAN_JC_SCALED) / calibration->neg_disp[0]);
         y = (y > 0)?
-            ((y * KSCAN_JC_SCALED) / y_pos_disp):
-            ((y * KSCAN_JC_SCALED) / y_neg_disp);
+            ((y * KSCAN_JC_SCALED) / calibration->pos_disp[1]):
+            ((y * KSCAN_JC_SCALED) / calibration->neg_disp[1]);
 
         // LOG_DBG("CAL ADC CH0: %d, CH1: %d", x, y);
 
@@ -353,10 +340,6 @@ static int kscan_joystick_enable(const struct device *dev) {
     // Trigger a calibration
     calibration->counter = 0;
     calibration->is_active = true;
-    calibration->neg_disp[0] = KSCAN_JC_MIN_DISP;
-    calibration->pos_disp[0] = KSCAN_JC_MIN_DISP;
-    calibration->neg_disp[1] = KSCAN_JC_MIN_DISP;
-    calibration->pos_disp[1] = KSCAN_JC_MIN_DISP;
     
     // Start periodic ADC scanning
     k_work_reschedule(&data->work, K_MSEC(config->poll_period_ms));
@@ -403,10 +386,6 @@ static int kscan_joystick_init(const struct device *dev) {
     // Trigger a calibration
     calibration->counter = 0;
     calibration->is_active = true;
-    calibration->neg_disp[0] = KSCAN_JC_MIN_DISP;
-    calibration->pos_disp[0] = KSCAN_JC_MIN_DISP;
-    calibration->neg_disp[1] = KSCAN_JC_MIN_DISP;
-    calibration->pos_disp[1] = KSCAN_JC_MIN_DISP;
     memset(calibration->samples, 0, sizeof(calibration->samples));
 
     // Check both channels belong to same device for sequence scan
