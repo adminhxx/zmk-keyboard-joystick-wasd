@@ -48,6 +48,7 @@
         // Include the direct driver
         direct {
             kscan = <&kscan2>;
+            row-offset = <1>;
         };
     };
 
