@@ -11,21 +11,21 @@
 
         default_layer {
             bindings = < 
-              &kp A     &kp W     &kp D     &kp S
+              &kp D     &kp W     &kp A     &kp S
               &kp C_MUTE    &bt BT_CLR_ALL    
             >;
         };
 
         bt_layer {
             bindings = <
-                &kp A     &kp W     &kp D     &kp S
+                &kp D     &kp W     &kp A     &kp S
                 &kp C_MUTE    &bt BT_CLR_ALL
             >;
         };
 
         layer_3 {
             bindings = <
-              &kp A     &kp W     &kp D     &kp S
+              &kp D     &kp W     &kp A     &kp S
               &kp C_MUTE    &bt BT_CLR_ALL
             >;
         };
