@@ -1,2 +1,0 @@
-config SHIELD_2KBD
-    def_bool $(shields_list_contains,2kbd)

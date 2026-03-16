@@ -10,23 +10,23 @@
         compatible = "zmk,keymap";
 
         default_layer {
-            bindings = <
-              &bt BT_CLR_ALL &kp K_VOL_UP  &kp K_VOL_DN
-              &kp W     &kp D     &kp S     &kp A
+            bindings = < 
+              &kp A     &kp W     &kp D     &kp S
+              &kp C_MUTE    &bt BT_CLR_ALL    
             >;
         };
 
         bt_layer {
             bindings = <
-                &bt BT_CLR_ALL &msc SCRL_UP  &msc SCRL_DOWN
-                &kp W     &kp D     &kp S     &kp A
+                &kp A     &kp W     &kp D     &kp S
+                &kp C_MUTE    &bt BT_CLR_ALL
             >;
         };
 
         layer_3 {
             bindings = <
-                &bt BT_CLR_ALL &msc SCRL_UP  &msc SCRL_DOWN
-                &kp W     &kp D     &kp S     &kp A
+              &kp A     &kp W     &kp D     &kp S
+              &kp C_MUTE    &bt BT_CLR_ALL
             >;
         };
     };

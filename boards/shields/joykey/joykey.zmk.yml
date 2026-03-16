@@ -1,7 +1,7 @@
 ---
 file_format: "1"
-id: 2kbd
-name: 2kbd
+id: joykey
+name: joykey
 type: shield
 url: https://github.com/adminhxx/RCPen
 requires: [pro_micro]
