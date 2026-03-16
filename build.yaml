@@ -37,7 +37,8 @@ include:
     snippet: studio-rpc-usb-uart
   - board: nice_nano@2.0.0
     shield: Dpad6
-    snippet: zmk-usb-logging
+    snippet: studio-rpc-usb-uart
+    #snippet: zmk-usb-logging
   - board: nice_nano@2.0.0
     shield: JoyTest
     snippet: studio-rpc-usb-uart

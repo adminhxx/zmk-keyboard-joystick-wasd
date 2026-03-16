@@ -66,8 +66,6 @@
         idle-period-ms = <50>; /* 20Hz */
         angle-overlap = <30>;
         /* Increase threshold/hysteris to suppress idle jitter */
-        thresholds = [3C];
-        hysteris = <18>;
         status = "okay";
         wakeup-source;
         io-channels = <&adc 5>, <&adc 7>;
