@@ -41,7 +41,6 @@
 
         direct_one {
             kscan = <&kscan1>;
-            row-offset = <0>; // ...and shift it to not overlap
         };
 
         direct_two {
@@ -67,7 +66,6 @@
         angle-overlap = <30>;
         /* do not use a second threshold with bad quality joysticks */
         /* thresholds = [0A 78]; */
-        thresholds = [06 78];
         status = "okay";
         wakeup-source;
         io-channels = <&adc 5>, <&adc 7>;
